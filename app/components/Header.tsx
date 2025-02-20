@@ -1,6 +1,6 @@
 'use client';
 
-import { MouseEvent, useState } from 'react';
+import {useState } from 'react';
 import Link from 'next/link';
 
 export default function Header() {
@@ -15,7 +15,7 @@ export default function Header() {
   ];
 
   // Handle smooth scrolling
-  const handleScroll = (e: MouseEvent<HTMLAnchorElement, MouseEvent>, href: string) => {
+  const handleScroll = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
     e.preventDefault(); // Prevent default anchor behavior
     const targetId = href.substring(1); // Remove '#' from href
     const targetElement = document.getElementById(targetId);
