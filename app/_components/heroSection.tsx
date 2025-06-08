@@ -47,46 +47,65 @@ export default function HeroSection() {
       initial="hidden"
       animate="visible"
     >
-      <img
+      
+      <motion.img
         id="background"
         src="/img/ManyCircle.svg"
         alt="background"
         className="absolute top-0 left-0 w-20 md:w-40 h-auto"
+        initial={{ opacity: 0, x: -100, rotate: -10, y: -50 }}
+        animate={{ opacity: 1, x: 0, rotate: 0, y: 0 }}
+        transition={{ duration: 1.5, ease: "easeOut" }}
       />
       <section className="container mx-auto grid grid-cols-1 md:grid-cols-2 gap-8 items-center justify-items-center w-full px-12 py-14">
         <motion.div
           id="sectionAing"
           className="relative w-full flex justify-center"
           variants={itemVariants}
+          transition={{ duration: 0.8, ease: "easeOut" }}
         >
-          <img
+          <motion.img
             id="fotoAing"
             src="/img/gambarAing.svg"
             alt="profile"
             className="max-w-[18rem] md:max-w-[35rem] w-full h-auto"
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ delay: 0.3, duration: 0.8, ease: "easeOut" }}
           />
           <motion.img
             id="dash"
             src="/img/dash.svg"
             alt="dash"
             className="w-full absolute bottom-0 left-6 md:left-20 translate-y-[20%] max-w-[8rem]
-          md:max-w-[15rem] h-auto"
-            initial={{ opacity: 0, x: -100 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: 0.6, duration: 0.8 }}
+        md:max-w-[15rem] h-auto"
+            initial={{ opacity: 0, x: -100, rotate: -10 }}
+            animate={{ opacity: 1, x: 0, rotate: 0 }}
+            transition={{ delay: 0.6, duration: 0.8, ease: "backOut" }}
           />
         </motion.div>
         <motion.div
           id="sectionDesc"
           className="flex flex-col gap-6 items-end"
           variants={textVariants}
+          transition={{ duration: 0.8, ease: "easeOut" }}
         >
-          <h1 id="Name" className="text-xl md:text-4xl bg-red-accent w-fit p-2">
+          <motion.h1
+            id="Name"
+            className="text-xl md:text-4xl bg-red-accent w-fit p-2"
+            initial={{ opacity: 0, y: -50 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.4, duration: 0.6, ease: "easeOut" }}
+          >
             Ahmad Thoriq Saputra
-          </h1>
-          <p className="text-lg md:text-2xl text-white text-justify md:max-w-[40rem] leading-5">
-            A{" "}
-            <span className="text-highlight-orange">software developer</span>{" "}
+          </motion.h1>
+          <motion.p
+            className="text-lg md:text-2xl text-white text-justify md:max-w-[40rem] leading-5"
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.6, duration: 0.8, ease: "easeOut" }}
+          >
+            A <span className="text-highlight-orange">software developer</span>{" "}
             and <span className="text-highlight-orange">designer</span>{" "}
             dedicated to building user-friendly websites. I use my coding skills
             and algorithms to{" "}
@@ -95,7 +114,7 @@ export default function HeroSection() {
               create innovative solutions{" "}
             </span>
             that help people achieve their goals.
-          </p>
+          </motion.p>
           <motion.div
             id="buttonSec"
             className="flex w-full items-start gap-4 md:gap-6"
@@ -106,14 +125,16 @@ export default function HeroSection() {
             <motion.button
               id="ViewWorkBut"
               className="
-          px-5 md:px-8 py-2 border border-black/[0.427] rounded-md
-          bg-[#bb4116] text-white font-bold text-sm md:text-xl
-          relative overflow-hidden group
-        "
+        px-5 md:px-8 py-2 border border-black/[0.427] rounded-md
+        bg-[#bb4116] text-white font-bold text-sm md:text-xl
+        relative overflow-hidden group
+      "
               variants={buttonVariants}
               initial="hidden"
               animate="visible"
               whileHover="hover"
+              whileTap={{ scale: 0.95 }}
+              transition={{ delay: 0.8 }}
             >
               <span className="absolute inset-0 bg-orange-400 transform -translate-x-full transition-transform duration-300 ease-out group-hover:translate-x-0 z-0"></span>
               <Link
@@ -127,15 +148,16 @@ export default function HeroSection() {
             <motion.button
               id="WithMeButton"
               className="
-          px-5 md:px-8 py-2 border border-black/[0.427] rounded-md
-          bg-pink-accent text-white font-bold text-sm md:text-xl
-          relative overflow-hidden group
-        "
+        px-5 md:px-8 py-2 border border-black/[0.427] rounded-md
+        bg-pink-accent text-white font-bold text-sm md:text-xl
+        relative overflow-hidden group
+      "
               variants={buttonVariants}
               initial="hidden"
               animate="visible"
-              transition={{ delay: 0.2 }}
+              transition={{ delay: 1.0 }}
               whileHover="hover"
+              whileTap={{ scale: 0.95 }}
             >
               <span className="absolute inset-0 bg-red-400 transform -translate-x-full transition-transform duration-300 ease-out group-hover:translate-x-0 z-0"></span>
               <Link
@@ -148,6 +170,7 @@ export default function HeroSection() {
           </motion.div>
         </motion.div>
       </section>
+      <div className="bg-dark-blue h-2 w-full translate-y-1/2 block md:hidden"/>
     </motion.main>
   );
 }

@@ -281,7 +281,7 @@ export default function SkillSection() {
     <section
       id="MeSkill"
       ref={ref}
-      className="bg-gradient-to-br from-[#fc6b39] to-[#d56d74] min-h-screen w-full relative border-b-8 border-pink-500 overflow-hidden"
+      className="bg-gradient-to-br from-[#fc6b39] to-[#d56d74] h-fit w-full relative border-b-8 border-pink-accent overflow-hidden"
     >
 
       <img
