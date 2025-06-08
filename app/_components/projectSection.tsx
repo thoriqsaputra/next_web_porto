@@ -1,6 +1,3 @@
-// projectSection.tsx
-"use client";
-
 import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useInView } from "react-intersection-observer";
@@ -16,11 +13,9 @@ import {
   SelectValue,
 } from "~/components/ui/select";
 
-// Import the new components
 import { ProjectCard } from "~/components/project/ProjectCard";
 import { ProjectDetailDialog } from "~/components/project/ProjectDetailDialog";
 
-// Define project types and categories
 export type ProjectCategory =
   | "web"
   | "ai"
