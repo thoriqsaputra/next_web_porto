@@ -1,6 +1,6 @@
 // components/ProjectDetailDialog.tsx
-import React from "react"
-import { motion, AnimatePresence } from "framer-motion"
+import React from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import {
   X,
   ChevronLeft,
@@ -10,41 +10,56 @@ import {
   Calendar,
   Tag,
   Layers,
-} from "lucide-react"
-import { Button } from "~/components/ui/button"
-import { Badge } from "~/components/ui/badge"
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "~/components/ui/dialog"
+} from "lucide-react";
+import { Button } from "~/components/ui/button";
+import { Badge } from "~/components/ui/badge";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "~/components/ui/dialog";
 import { Link } from "@remix-run/react";
+import { DialogClose } from "@radix-ui/react-dialog";
 
 interface ProjectImage {
-  src: string
-  alt: string
+  src: string;
+  alt: string;
 }
 
 interface Project {
-  id: string
-  title: string
-  description: string
-  longDescription?: string
-  images: ProjectImage[]
-  category: ProjectCategory
-  technologies: ProjectTechnology[]
-  githubUrl?: string
-  liveUrl?: string
-  date: string
-  featured?: boolean
+  id: string;
+  title: string;
+  description: string;
+  longDescription?: string;
+  images: ProjectImage[];
+  category: ProjectCategory;
+  technologies: ProjectTechnology[];
+  githubUrl?: string;
+  liveUrl?: string;
+  date: string;
+  featured?: boolean;
 }
 
-type ProjectCategory = "web" | "ai" | "mobile" | "desktop" | "game" | "all"
-type ProjectTechnology = "react" | "nextjs" | "spring" | "flask" | "wpf" | "tailwind" | "python" | "java" | "csharp"
+type ProjectCategory = "web" | "ai" | "mobile" | "desktop" | "game" | "all";
+type ProjectTechnology =
+  | "react"
+  | "nextjs"
+  | "spring"
+  | "flask"
+  | "wpf"
+  | "tailwind"
+  | "python"
+  | "java"
+  | "csharp";
 
 interface ProjectDetailDialogProps {
-  selectedProject: Project | null
-  setSelectedProject: (project: Project | null) => void
-  activeImageIndex: number
-  setActiveImageIndex: React.Dispatch<React.SetStateAction<number>>
-  direction: number
-  setDirection: (direction: number) => void
+  selectedProject: Project | null;
+  setSelectedProject: (project: Project | null) => void;
+  activeImageIndex: number;
+  setActiveImageIndex: React.Dispatch<React.SetStateAction<number>>;
+  direction: number;
+  setDirection: (direction: number) => void;
 }
 
 const carouselVariants = {
@@ -66,7 +81,7 @@ const carouselVariants = {
       duration: 0.3,
     },
   }),
-}
+};
 
 const getTechBadgeColor = (tech: string) => {
   const techColors: Record<string, string> = {
@@ -79,10 +94,10 @@ const getTechBadgeColor = (tech: string) => {
     python: "bg-yellow-500 hover:bg-yellow-600",
     java: "bg-red-500 hover:bg-red-600",
     csharp: "bg-green-600 hover:bg-green-700",
-  }
+  };
 
-  return techColors[tech] || "bg-gray-500 hover:bg-gray-600"
-}
+  return techColors[tech] || "bg-gray-500 hover:bg-gray-600";
+};
 
 export const ProjectDetailDialog: React.FC<ProjectDetailDialogProps> = ({
   selectedProject,
@@ -93,25 +108,34 @@ export const ProjectDetailDialog: React.FC<ProjectDetailDialogProps> = ({
   setDirection,
 }) => {
   const nextImage = () => {
-    if (!selectedProject) return
-    setDirection(1)
-    setActiveImageIndex((prevIndex: number) => (prevIndex === selectedProject.images.length - 1 ? 0 : prevIndex + 1))
-  }
+    if (!selectedProject) return;
+    setDirection(1);
+    setActiveImageIndex((prevIndex: number) =>
+      prevIndex === selectedProject.images.length - 1 ? 0 : prevIndex + 1
+    );
+  };
 
   const prevImage = () => {
-    if (!selectedProject) return
-    setDirection(-1)
-    setActiveImageIndex((prevIndex: number) => (prevIndex === 0 ? selectedProject.images.length - 1 : prevIndex - 1))
-  }
+    if (!selectedProject) return;
+    setDirection(-1);
+    setActiveImageIndex((prevIndex: number) =>
+      prevIndex === 0 ? selectedProject.images.length - 1 : prevIndex - 1
+    );
+  };
 
   return (
-    <Dialog open={!!selectedProject} onOpenChange={(open) => !open && setSelectedProject(null)}>
-      <DialogContent className=" z-[999] rounded-2xl
+    <Dialog
+      open={!!selectedProject}
+      onOpenChange={(open) => !open && setSelectedProject(null)}
+    >
+      <DialogContent
+        className=" z-[999] rounded-2xl
         w-full max-w-[95vw] sm:max-w-[90vw] md:max-w-4xl lg:max-w-6xl xl:max-w-7xl
         h-full max-h-[95vh] sm:max-h-[90vh]
         bg-gradient-to-br from-medium-gray via-dark-blue to-medium-gray 
-        border border-white/20 text-white overflow-y-auto
-        p-3 sm:p-4 md:p-6">
+        border border-white/20 text-white overflow-clip
+        p-3 sm:p-4 md:p-6"
+      >
         {selectedProject && (
           <motion.div
             initial={{ opacity: 0, scale: 0.95 }}
@@ -123,39 +147,70 @@ export const ProjectDetailDialog: React.FC<ProjectDetailDialogProps> = ({
             <DialogHeader className="border-b border-white/10 pb-3 sm:pb-4 mb-4 sm:mb-6">
               <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 sm:gap-4">
                 <div className="flex-1 min-w-0">
-                  <DialogTitle className="
+                  <div className="flex">
+                    <DialogTitle
+                      className="
                     text-xl sm:text-2xl md:text-3xl font-bold 
                     bg-gradient-to-r from-highlight-orange to-light-orange bg-clip-text text-transparent 
-                    mb-2 leading-tight">
-                    {selectedProject.title}
-                  </DialogTitle>
+                    mb-4 leading-tight"
+                    >
+                      {selectedProject.title}
+                    </DialogTitle>
+                    <DialogClose asChild className="absolute top-2 right-2 sm:top-4 sm:right-4 flex md:hidden">
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="group relative text-white hover:bg-red-500/20 rounded-full h-8 w-8 sm:h-10 sm:w-10 
+                      transition-all duration-300 ease-in-out transform hover:scale-110 hover:rotate-90
+                      border border-white/20 hover:border-red-500/50 backdrop-blur-sm"
+                      >
+                        <X className="h-4 w-4 sm:h-5 sm:w-5 transition-all duration-300 group-hover:text-red-400" />
+                        <div
+                          className="absolute inset-0 rounded-full bg-gradient-to-r from-red-500/0 to-red-500/0 
+                      group-hover:from-red-500/10 group-hover:to-red-600/10 transition-all duration-300"
+                        />
+                      </Button>
+                    </DialogClose>
+                  </div>
                   <div className="flex flex-wrap items-center gap-2 sm:gap-4 text-xs sm:text-sm text-white/70">
-                    <Badge variant="outline" className="border-highlight-orange/30 text-highlight-orange text-xs">
-                      {selectedProject.category.charAt(0).toUpperCase() + selectedProject.category.slice(1)}
+                    <Badge
+                      variant="outline"
+                      className="border-highlight-orange/30 text-highlight-orange text-xs"
+                    >
+                      {selectedProject.category.charAt(0).toUpperCase() +
+                        selectedProject.category.slice(1)}
                     </Badge>
                     <div className="flex items-center">
                       <Calendar className="h-3 w-3 sm:h-4 sm:w-4 mr-1" />
                       <span className="hidden sm:inline">
-                        {new Date(selectedProject.date).toLocaleDateString("en-US", {
-                          year: "numeric",
-                          month: "long",
-                          day: "numeric",
-                        })}
+                        {new Date(selectedProject.date).toLocaleDateString(
+                          "en-US",
+                          {
+                            year: "numeric",
+                            month: "long",
+                            day: "numeric",
+                          }
+                        )}
                       </span>
                       <span className="sm:hidden">
-                        {new Date(selectedProject.date).toLocaleDateString("en-US", {
-                          year: "numeric",
-                          month: "short",
-                        })}
+                        {new Date(selectedProject.date).toLocaleDateString(
+                          "en-US",
+                          {
+                            year: "numeric",
+                            month: "short",
+                          }
+                        )}
                       </span>
                     </div>
                     {selectedProject.featured && (
-                      <Badge className="bg-highlight-orange text-white text-xs">Featured</Badge>
+                      <Badge className="bg-highlight-orange text-white text-xs">
+                        Featured
+                      </Badge>
                     )}
                   </div>
                 </div>
 
-                <div className="flex gap-2 w-full sm:w-auto justify-center sm:justify-end">
+                <div className="flex gap-4 items-center w-full sm:w-auto justify-center sm:justify-end">
                   {selectedProject.githubUrl && (
                     <Button
                       variant="outline"
@@ -163,7 +218,11 @@ export const ProjectDetailDialog: React.FC<ProjectDetailDialogProps> = ({
                       className="border-white/20 text-black hover:bg-white/10 flex-1 sm:flex-none text-xs sm:text-sm"
                       asChild
                     >
-                      <Link to={selectedProject.githubUrl} target="_blank" rel="noopener noreferrer">
+                      <Link
+                        to={selectedProject.githubUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
                         <Github className="h-3 w-3 sm:h-4 sm:w-4 mr-1" />
                         <span className="hidden xs:inline">Code</span>
                         <span className="xs:hidden">GitHub</span>
@@ -171,22 +230,42 @@ export const ProjectDetailDialog: React.FC<ProjectDetailDialogProps> = ({
                     </Button>
                   )}
                   {selectedProject.liveUrl && (
-                    <Button 
-                      size="sm" 
-                      className="bg-highlight-orange hover:bg-highlight-orange/90 text-white flex-1 sm:flex-none text-xs sm:text-sm" 
-                      asChild>
-                      <Link to={selectedProject.liveUrl} target="_blank" rel="noopener noreferrer">
+                    <Button
+                      size="sm"
+                      className="bg-highlight-orange hover:bg-highlight-orange/90 text-white flex-1 sm:flex-none text-xs sm:text-sm"
+                      asChild
+                    >
+                      <Link
+                        to={selectedProject.liveUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
                         <ExternalLink className="h-3 w-3 sm:h-4 sm:w-4 mr-1" />
                         <span className="hidden xs:inline">Live Demo</span>
                         <span className="xs:hidden">Demo</span>
                       </Link>
                     </Button>
                   )}
+                  <DialogClose asChild className="hidden md:flex">
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="group relative text-white hover:bg-red-500/20 rounded-full h-8 w-8 sm:h-10 sm:w-10 
+                      transition-all duration-300 ease-in-out transform hover:scale-110 hover:rotate-90
+                      border border-white/20 hover:border-red-500/50 backdrop-blur-sm"
+                    >
+                      <X className="h-4 w-4 sm:h-5 sm:w-5 transition-all duration-300 group-hover:text-red-400" />
+                      <div
+                        className="absolute inset-0 rounded-full bg-gradient-to-r from-red-500/0 to-red-500/0 
+                      group-hover:from-red-500/10 group-hover:to-red-600/10 transition-all duration-300"
+                      />
+                    </Button>
+                  </DialogClose>
                 </div>
               </div>
             </DialogHeader>
 
-            <div className="flex-1 overflow-y-auto">
+            <div className="overflow-y-auto flex-1 max-h-[calc(100vh-200px)] md:max-h-[calc(100vh-300px)]">
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
                 <div className="lg:col-span-2 order-1 lg:order-1">
                   <div className="relative aspect-video overflow-hidden rounded-lg sm:rounded-xl bg-black/20 border border-white/10">
@@ -228,14 +307,16 @@ export const ProjectDetailDialog: React.FC<ProjectDetailDialogProps> = ({
                           <ChevronRight className="h-4 w-4 sm:h-5 sm:w-5" />
                         </Button>
 
-                        <div className="absolute bottom-2 sm:bottom-4 left-1/2 transform -translate-x-1/2 
-                          flex gap-1 sm:gap-2 bg-black/50 backdrop-blur-sm rounded-full px-2 sm:px-3 py-1 sm:py-2">
+                        <div
+                          className="absolute bottom-2 sm:bottom-4 left-1/2 transform -translate-x-1/2 
+                          flex gap-1 sm:gap-2 bg-black/50 backdrop-blur-sm rounded-full px-2 sm:px-3 py-1 sm:py-2"
+                        >
                           {selectedProject.images.map((_, index) => (
                             <button
                               key={index}
                               onClick={() => {
-                                setDirection(index > activeImageIndex ? 1 : -1)
-                                setActiveImageIndex(index)
+                                setDirection(index > activeImageIndex ? 1 : -1);
+                                setActiveImageIndex(index);
                               }}
                               className={`w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full transition-all duration-300 ${
                                 index === activeImageIndex
@@ -249,28 +330,32 @@ export const ProjectDetailDialog: React.FC<ProjectDetailDialogProps> = ({
                       </>
                     )}
 
-                    <div className="absolute top-2 sm:top-4 right-2 sm:right-4 
-                      bg-black/50 backdrop-blur-sm text-white text-xs sm:text-sm px-2 sm:px-3 py-1 rounded-full">
+                    <div
+                      className="absolute top-2 sm:top-4 right-2 sm:right-4 
+                      bg-black/50 backdrop-blur-sm text-white text-xs sm:text-sm px-2 sm:px-3 py-1 rounded-full"
+                    >
                       {activeImageIndex + 1} / {selectedProject.images.length}
                     </div>
                   </div>
 
                   {selectedProject.images.length > 1 && (
-                    <div className="flex gap-1 sm:gap-2 mt-3 sm:mt-4 overflow-x-auto pb-2 
-                      scrollbar-thin scrollbar-thumb-white/20 scrollbar-track-transparent">
+                    <div
+                      className="flex gap-1 sm:gap-2 mt-3 sm:mt-4 overflow-x-auto pb-2 
+                      scrollbar-thin scrollbar-thumb-white/20 scrollbar-track-transparent"
+                    >
                       {selectedProject.images.map((image, index) => (
                         <button
                           key={index}
                           onClick={() => {
-                            setDirection(index > activeImageIndex ? 1 : -1)
-                            setActiveImageIndex(index)
+                            setDirection(index > activeImageIndex ? 1 : -1);
+                            setActiveImageIndex(index);
                           }}
                           className={`relative flex-shrink-0 w-16 h-10 sm:w-20 sm:h-12 rounded-md sm:rounded-lg 
                             overflow-hidden border-2 transition-all ${
-                            index === activeImageIndex
-                              ? "border-highlight-orange"
-                              : "border-white/20 hover:border-white/40"
-                          }`}
+                              index === activeImageIndex
+                                ? "border-highlight-orange"
+                                : "border-white/20 hover:border-white/40"
+                            }`}
                         >
                           <img
                             src={image.src || "/placeholder.svg"}
@@ -285,25 +370,35 @@ export const ProjectDetailDialog: React.FC<ProjectDetailDialogProps> = ({
 
                 <div className="space-y-3 sm:space-y-4 md:space-y-6 order-2 lg:order-2">
                   <div className="bg-white/5 backdrop-blur-sm rounded-lg sm:rounded-xl p-3 sm:p-4 border border-white/10">
-                    <h4 className="text-base sm:text-lg font-semibold text-highlight-orange mb-2 sm:mb-3 
-                      flex items-center">
+                    <h4
+                      className="text-base sm:text-lg font-semibold text-highlight-orange mb-2 sm:mb-3 
+                      flex items-center"
+                    >
                       <Tag className="h-3 w-3 sm:h-4 sm:w-4 mr-2" />
                       Project Overview
                     </h4>
                     <p className="text-white/80 leading-relaxed text-xs sm:text-sm">
-                      {selectedProject.longDescription || selectedProject.description}
+                      {selectedProject.longDescription ||
+                        selectedProject.description}
                     </p>
                   </div>
 
                   <div className="bg-white/5 backdrop-blur-sm rounded-lg sm:rounded-xl p-3 sm:p-4 border border-white/10">
-                    <h4 className="text-base sm:text-lg font-semibold text-highlight-orange mb-2 sm:mb-3 
-                      flex items-center">
+                    <h4
+                      className="text-base sm:text-lg font-semibold text-highlight-orange mb-2 sm:mb-3 
+                      flex items-center"
+                    >
                       <Layers className="h-3 w-3 sm:h-4 sm:w-4 mr-2" />
                       Technologies Used
                     </h4>
                     <div className="flex flex-wrap gap-1 sm:gap-2">
                       {selectedProject.technologies.map((tech) => (
-                        <Badge key={tech} className={`${getTechBadgeColor(tech)} text-white text-xs`}>
+                        <Badge
+                          key={tech}
+                          className={`${getTechBadgeColor(
+                            tech
+                          )} text-white text-xs`}
+                        >
                           {tech}
                         </Badge>
                       ))}
@@ -317,25 +412,34 @@ export const ProjectDetailDialog: React.FC<ProjectDetailDialogProps> = ({
                     <div className="space-y-1.5 sm:space-y-2 text-xs sm:text-sm">
                       <div className="flex justify-between">
                         <span className="text-white/70">Category:</span>
-                        <span className="text-white capitalize">{selectedProject.category}</span>
+                        <span className="text-white capitalize">
+                          {selectedProject.category}
+                        </span>
                       </div>
                       <div className="flex justify-between">
                         <span className="text-white/70">Completion:</span>
                         <span className="text-white">
-                          {new Date(selectedProject.date).toLocaleDateString("en-US", {
-                            month: "short",
-                            year: "numeric",
-                          })}
+                          {new Date(selectedProject.date).toLocaleDateString(
+                            "en-US",
+                            {
+                              month: "short",
+                              year: "numeric",
+                            }
+                          )}
                         </span>
                       </div>
                       <div className="flex justify-between">
                         <span className="text-white/70">Tech Stack:</span>
-                        <span className="text-white">{selectedProject.technologies.length} technologies</span>
+                        <span className="text-white">
+                          {selectedProject.technologies.length} technologies
+                        </span>
                       </div>
                       {selectedProject.featured && (
                         <div className="flex justify-between">
                           <span className="text-white/70">Status:</span>
-                          <Badge className="bg-highlight-orange text-white text-xs">Featured</Badge>
+                          <Badge className="bg-highlight-orange text-white text-xs">
+                            Featured
+                          </Badge>
                         </div>
                       )}
                     </div>
@@ -347,5 +451,5 @@ export const ProjectDetailDialog: React.FC<ProjectDetailDialogProps> = ({
         )}
       </DialogContent>
     </Dialog>
-  )
-}
+  );
+};

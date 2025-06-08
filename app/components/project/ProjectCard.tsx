@@ -240,7 +240,6 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({
                 </div>
               </div>
 
-              {/* Actions */}
               <div className="flex flex-row justify-between">
                 <Button
                   variant="ghost"

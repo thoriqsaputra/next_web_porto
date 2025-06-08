@@ -98,14 +98,6 @@ export default function ProjectSection() {
           src: "/project/sakedik.png",
           alt: "Biometric Project Main Interface",
         },
-        {
-          src: "/placeholder.svg?height=400&width=600",
-          alt: "Fingerprint Analysis Screen",
-        },
-        {
-          src: "/placeholder.svg?height=400&width=600",
-          alt: "User Authentication Process",
-        },
       ],
       category: "desktop",
       technologies: ["csharp", "wpf"],
@@ -122,14 +114,6 @@ export default function ProjectSection() {
         "The Word Ladder Game is an interactive web application that challenges users to transform one word into another by changing one letter at a time. Built with Next.js for the frontend and Spring Boot for the backend, this project demonstrates the implementation of various search algorithms including Uniform Cost Search (UCS), Greedy Best First Search, and A* Search. Users can visualize how each algorithm finds the optimal path between words, with real-time comparisons of performance metrics. The game includes difficulty levels, custom dictionaries, and a leaderboard system.",
       images: [
         { src: "/project/wl.png", alt: "Word Ladder Game Interface" },
-        {
-          src: "/placeholder.svg?height=400&width=600",
-          alt: "Algorithm Visualization",
-        },
-        {
-          src: "/placeholder.svg?height=400&width=600",
-          alt: "Game Statistics Dashboard",
-        },
       ],
       category: "web",
       technologies: ["nextjs", "react", "spring", "java"],
@@ -146,14 +130,6 @@ export default function ProjectSection() {
         "The Content-Based Information Retrieval (CBIR) Platform is a comprehensive solution for searching and retrieving multimedia content based on its inherent visual and textual characteristics rather than metadata. Built with Flask for the backend API, React for the frontend interface, and styled with Tailwind CSS, this platform implements various image processing algorithms to extract features suchs as color histograms, texture patterns, and shape descriptors. Users can upload images and search for similar content within the database, with adjustable similarity thresholds and feature weighting. The system also includes text-based search capabilities integrated with visual search for a more powerful retrieval experience.",
       images: [
         { src: "/project/cbir.png", alt: "CBIR Platform Dashboard" },
-        {
-          src: "/placeholder.svg?height=400&width=600",
-          alt: "Image Search Results",
-        },
-        {
-          src: "/placeholder.svg?height=400&width=600",
-          alt: "Feature Extraction Process",
-        },
       ],
       category: "web",
       technologies: ["react", "flask", "python", "tailwind"],
@@ -162,86 +138,86 @@ export default function ProjectSection() {
       date: "2023-09-10",
       featured: true,
     },
-    {
-      id: "ai-chatbot",
-      title: "AI-Powered Customer Service Chatbot",
-      description:
-        "An intelligent chatbot system that uses natural language processing to provide automated customer support for e-commerce platforms.",
-      longDescription:
-        "This AI-powered chatbot leverages advanced natural language processing techniques to understand and respond to customer inquiries in real-time. Built with Python and integrated with popular e-commerce platforms, the system can handle product inquiries, order status checks, returns processing, and general customer support questions. The chatbot learns from interactions to continuously improve its responses and can escalate complex issues to human agents when necessary. Analytics dashboard provides insights into common customer questions and satisfaction metrics.",
-      images: [
-        {
-          src: "/placeholder.svg?height=400&width=600",
-          alt: "Chatbot Interface",
-        },
-        {
-          src: "/placeholder.svg?height=400&width=600",
-          alt: "Admin Dashboard",
-        },
-        {
-          src: "/placeholder.svg?height=400&width=600",
-          alt: "Analytics Overview",
-        },
-      ],
-      category: "ai",
-      technologies: ["python", "flask"],
-      githubUrl: "https://github.com/username/ai-chatbot",
-      liveUrl: "https://ai-chatbot-demo.example.com",
-      date: "2023-11-05",
-    },
-    {
-      id: "mobile-fitness",
-      title: "Personal Fitness Tracking App",
-      description:
-        "A cross-platform mobile application for tracking workouts, nutrition, and personal fitness goals with customized recommendations.",
-      longDescription:
-        "The Personal Fitness Tracking App is a comprehensive mobile solution designed to help users achieve their health and fitness goals. Built with React Native for cross-platform compatibility, the app features workout tracking with video demonstrations, nutrition logging with barcode scanning, goal setting and progress visualization, and personalized recommendations based on user data. The app integrates with popular fitness wearables to import activity data and includes social features for sharing achievements and participating in challenges with friends.",
-      images: [
-        {
-          src: "/placeholder.svg?height=400&width=600",
-          alt: "Fitness App Home Screen",
-        },
-        {
-          src: "/placeholder.svg?height=400&width=600",
-          alt: "Workout Tracking Interface",
-        },
-        {
-          src: "/placeholder.svg?height=400&width=600",
-          alt: "Progress Analytics",
-        },
-      ],
-      category: "mobile",
-      technologies: ["react"],
-      githubUrl: "https://github.com/username/fitness-app",
-      date: "2024-01-18",
-    },
-    {
-      id: "adventure-game",
-      title: "3D Adventure Game with Procedural Generation",
-      description:
-        "An immersive 3D adventure game featuring procedurally generated worlds, dynamic weather systems, and adaptive AI opponents.",
-      longDescription:
-        "This 3D adventure game showcases advanced game development techniques including procedural world generation, realistic physics, dynamic weather and lighting systems, and adaptive AI behavior. Built with Unity and C#, the game creates unique landscapes, dungeons, and challenges for each playthrough. The narrative adapts based on player choices, creating a personalized storytelling experience. The game features a custom shader system for realistic environmental effects and an optimized rendering pipeline for performance across various hardware configurations.",
-      images: [
-        {
-          src: "/placeholder.svg?height=400&width=600",
-          alt: "Game World Overview",
-        },
-        {
-          src: "/placeholder.svg?height=400&width=600",
-          alt: "Character Customization",
-        },
-        {
-          src: "/placeholder.svg?height=400&width=600",
-          alt: "Combat Sequence",
-        },
-      ],
-      category: "game",
-      technologies: ["csharp"],
-      githubUrl: "https://github.com/username/adventure-game",
-      liveUrl: "https://adventure-game.example.com",
-      date: "2024-02-28",
-    },
+    // {
+    //   id: "ai-chatbot",
+    //   title: "AI-Powered Customer Service Chatbot",
+    //   description:
+    //     "An intelligent chatbot system that uses natural language processing to provide automated customer support for e-commerce platforms.",
+    //   longDescription:
+    //     "This AI-powered chatbot leverages advanced natural language processing techniques to understand and respond to customer inquiries in real-time. Built with Python and integrated with popular e-commerce platforms, the system can handle product inquiries, order status checks, returns processing, and general customer support questions. The chatbot learns from interactions to continuously improve its responses and can escalate complex issues to human agents when necessary. Analytics dashboard provides insights into common customer questions and satisfaction metrics.",
+    //   images: [
+    //     {
+    //       src: "/placeholder.svg?height=400&width=600",
+    //       alt: "Chatbot Interface",
+    //     },
+    //     {
+    //       src: "/placeholder.svg?height=400&width=600",
+    //       alt: "Admin Dashboard",
+    //     },
+    //     {
+    //       src: "/placeholder.svg?height=400&width=600",
+    //       alt: "Analytics Overview",
+    //     },
+    //   ],
+    //   category: "ai",
+    //   technologies: ["python", "flask"],
+    //   githubUrl: "https://github.com/username/ai-chatbot",
+    //   liveUrl: "https://ai-chatbot-demo.example.com",
+    //   date: "2023-11-05",
+    // },
+    // {
+    //   id: "mobile-fitness",
+    //   title: "Personal Fitness Tracking App",
+    //   description:
+    //     "A cross-platform mobile application for tracking workouts, nutrition, and personal fitness goals with customized recommendations.",
+    //   longDescription:
+    //     "The Personal Fitness Tracking App is a comprehensive mobile solution designed to help users achieve their health and fitness goals. Built with React Native for cross-platform compatibility, the app features workout tracking with video demonstrations, nutrition logging with barcode scanning, goal setting and progress visualization, and personalized recommendations based on user data. The app integrates with popular fitness wearables to import activity data and includes social features for sharing achievements and participating in challenges with friends.",
+    //   images: [
+    //     {
+    //       src: "/placeholder.svg?height=400&width=600",
+    //       alt: "Fitness App Home Screen",
+    //     },
+    //     {
+    //       src: "/placeholder.svg?height=400&width=600",
+    //       alt: "Workout Tracking Interface",
+    //     },
+    //     {
+    //       src: "/placeholder.svg?height=400&width=600",
+    //       alt: "Progress Analytics",
+    //     },
+    //   ],
+    //   category: "mobile",
+    //   technologies: ["react"],
+    //   githubUrl: "https://github.com/username/fitness-app",
+    //   date: "2024-01-18",
+    // },
+    // {
+    //   id: "adventure-game",
+    //   title: "3D Adventure Game with Procedural Generation",
+    //   description:
+    //     "An immersive 3D adventure game featuring procedurally generated worlds, dynamic weather systems, and adaptive AI opponents.",
+    //   longDescription:
+    //     "This 3D adventure game showcases advanced game development techniques including procedural world generation, realistic physics, dynamic weather and lighting systems, and adaptive AI behavior. Built with Unity and C#, the game creates unique landscapes, dungeons, and challenges for each playthrough. The narrative adapts based on player choices, creating a personalized storytelling experience. The game features a custom shader system for realistic environmental effects and an optimized rendering pipeline for performance across various hardware configurations.",
+    //   images: [
+    //     {
+    //       src: "/placeholder.svg?height=400&width=600",
+    //       alt: "Game World Overview",
+    //     },
+    //     {
+    //       src: "/placeholder.svg?height=400&width=600",
+    //       alt: "Character Customization",
+    //     },
+    //     {
+    //       src: "/placeholder.svg?height=400&width=600",
+    //       alt: "Combat Sequence",
+    //     },
+    //   ],
+    //   category: "game",
+    //   technologies: ["csharp"],
+    //   githubUrl: "https://github.com/username/adventure-game",
+    //   liveUrl: "https://adventure-game.example.com",
+    //   date: "2024-02-28",
+    // },
   ];
 
   // State management
@@ -369,7 +345,7 @@ export default function ProjectSection() {
     <section
       id="projects"
       ref={ref}
-      className="min-h-screen w-full relative bg-gradient-to-br from-medium-gray to-dark-blue overflow-hidden"
+      className="h-fit w-full relative bg-gradient-to-br from-medium-gray to-dark-blue overflow-hidden"
     >
       <div className="absolute top-0 left-0 w-full h-full overflow-hidden z-0">
         <div className="absolute top-[10%] left-[5%] w-64 h-64 rounded-full bg-highlight-orange/10 blur-3xl"></div>
