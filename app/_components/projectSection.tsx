@@ -118,7 +118,7 @@ export default function ProjectSection() {
       category: "web",
       technologies: ["nextjs", "react", "spring", "java"],
       githubUrl: "https://github.com/thoriqsaputra/Tucil3_13522141",
-      liveUrl: "https://word-ladder-game.example.com",
+      // liveUrl: "https://word-ladder-game.example.com",
       date: "2023-06-22",
     },
     {
@@ -134,7 +134,7 @@ export default function ProjectSection() {
       category: "web",
       technologies: ["react", "flask", "python", "tailwind"],
       githubUrl: "https://github.com/thoriqsaputra/Algeo02-22123/tree/main",
-      liveUrl: "https://cbir-platform.example.com",
+      // liveUrl: "https://cbir-platform.example.com",
       date: "2023-09-10",
       featured: true,
     },
