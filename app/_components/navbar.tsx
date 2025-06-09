@@ -138,7 +138,7 @@ export default function Navbar() {
   return (
     <>
       <motion.nav
-        className="fixed mt-3 m-2 md:m-8 flex-col gap-6 md:gap-12 z-50 hidden md:flex"
+        className="fixed mt-3 m-2 md:m-3 lg:m-8 flex-col gap-6 md:gap-12 z-50 hidden md:flex"
         style={{ 
           y: navbarY, 
           opacity: navbarOpacity,
