@@ -109,25 +109,6 @@ const formVariants = {
   },
 };
 
-const floatingBubbleVariants = {
-  initial: (i: { id: number; x: number; y: number; opacity: number }) => ({
-    x: i.x,
-    y: i.y,
-    opacity: i.opacity,
-  }),
-  animate: (i: { id: number; x: number; y: number; opacity: number }) => ({
-    x: Math.random() * 20 - 10,
-    y: Math.random() * 20 - 10,
-    opacity: 0.7 + Math.random() * 0.3,
-    transition: {
-      duration: 3 + Math.random() * 2,
-      repeat: Number.POSITIVE_INFINITY,
-      repeatType: "reverse" as "reverse",
-      delay: i.id * 0.2,
-    },
-  }),
-};
-
 export default function ContactSection() {
   const [ref, inView] = useInView({
     triggerOnce: false,
@@ -161,45 +142,12 @@ export default function ContactSection() {
     }, 2000);
   };
 
-  const bubbles = useMemo(
-    () =>
-      Array.from({ length: 15 }, (_, i) => ({
-        id: i,
-        width: 20 + Math.random() * 60,
-        height: 20 + Math.random() * 60,
-        left: Math.random() * 100,
-        top: Math.random() * 100,
-        opacity: 0.7 + Math.random() * 0.3,
-        x: Math.random() * 10 - 5, 
-        y: Math.random() * 10 - 5,
-      })),
-    []
-  );
-
   return (
     <section
       id="contacts"
       ref={ref}
       className="w-full bg-light-pink border-b-8 border-pink-accent border-t-8 relative overflow-hidden"
     >
-      {/* Conditionally render bubbles only on the client-side to avoid SSR mismatch */}
-      {typeof window !== 'undefined' && bubbles.map((bubble) => (
-        <motion.div
-          key={bubble.id}
-          custom={bubble} // Pass all pre-calculated values as custom prop
-          variants={floatingBubbleVariants}
-          initial="initial"
-          animate="animate"
-          className="absolute rounded-full bg-pink-accent/10"
-          style={{
-            width: bubble.width,
-            height: bubble.height,
-            left: `${bubble.left}%`,
-            top: `${bubble.top}%`,
-            zIndex: 0,
-          }}
-        />
-      ))}
 
       <div
         id="ContactContent"
