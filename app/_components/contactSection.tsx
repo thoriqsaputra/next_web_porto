@@ -1,6 +1,5 @@
 import type React from "react";
-
-import { useState } from "react";
+import { useMemo, useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useInView } from "react-intersection-observer";
 import { Send, ExternalLink, Copy, Check } from "lucide-react";
@@ -8,6 +7,20 @@ import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
 import { Textarea } from "~/components/ui/textarea";
 import { Card, CardContent } from "~/components/ui/card";
+import { contacts } from "~/lib/contacts";
+import { useFetcher } from "@remix-run/react";
+
+type ActionData = {
+  success?: boolean;
+  message?: string;
+  error?: string;
+  fieldErrors?: {
+    name?: string;
+    email?: string;
+    subject?: string;
+    message?: string;
+  };
+};
 
 const contactCardVariants = {
   hidden: { opacity: 0, x: -50, y: 20 },
@@ -97,12 +110,12 @@ const formVariants = {
 };
 
 const floatingBubbleVariants = {
-  initial: (i: number) => ({
-    x: Math.random() * 10 - 5,
-    y: Math.random() * 10 - 5,
-    opacity: 0.7 + Math.random() * 0.3,
+  initial: (i: { id: number; x: number; y: number; opacity: number }) => ({
+    x: i.x,
+    y: i.y,
+    opacity: i.opacity,
   }),
-  animate: (i: number) => ({
+  animate: (i: { id: number; x: number; y: number; opacity: number }) => ({
     x: Math.random() * 20 - 10,
     y: Math.random() * 20 - 10,
     opacity: 0.7 + Math.random() * 0.3,
@@ -110,7 +123,7 @@ const floatingBubbleVariants = {
       duration: 3 + Math.random() * 2,
       repeat: Number.POSITIVE_INFINITY,
       repeatType: "reverse" as "reverse",
-      delay: i * 0.2,
+      delay: i.id * 0.2,
     },
   }),
 };
@@ -122,71 +135,22 @@ export default function ContactSection() {
   });
 
   const [activeTab, setActiveTab] = useState<"links" | "form">("links");
-  const [formStatus, setFormStatus] = useState<
-    "idle" | "submitting" | "success" | "error"
-  >("idle");
   const [copiedIndex, setCopiedIndex] = useState<number | null>(null);
+  
+  const fetcher = useFetcher<ActionData>();
+  
+  const formStatus = fetcher.state === "submitting" ? "submitting" : 
+                   fetcher.data?.success ? "success" :
+                   (fetcher.data?.error || fetcher.data?.fieldErrors) ? "error" : "idle";
 
-  const contacts = [
-    {
-      href: "mailto:saputrathoriq@gmail.com",
-      icon: "/contact/gmail.svg",
-      alt: "GMAIL",
-      title: "Email",
-      description:
-        "Send me an email to discuss your project or ask any questions",
-      value: "saputrathoriq@gmail.com",
-    },
-    {
-      href: "https://instagram.com/thoriqsaputra_",
-      icon: "/contact/instagram.svg",
-      alt: "instagram",
-      title: "Instagram",
-      description:
-        "Follow me on Instagram to see my latest projects and updates",
-      value: "@thoriqsaputra_",
-    },
-    {
-      href: "https://www.linkedin.com/in/thoriqsaputra/",
-      icon: "/contact/linkedin.svg",
-      alt: "linkedin",
-      title: "LinkedIn",
-      description:
-        "Connect with me on LinkedIn to view my professional profile",
-      value: "linkedin.com/in/thoriqsaputra/",
-    },
-    {
-      href: "https://github.com/thoriqsaputra",
-      icon: "/contact/github.svg",
-      alt: "github",
-      title: "GitHub",
-      description:
-        "Check out my GitHub repositories to see my latest code projects",
-      value: "github.com/thoriqsaputra",
-    },
-    {
-      href: "https://twitter.com/ThoriqSaputra1",
-      icon: "/contact/twitter.svg",
-      alt: "twitter",
-      title: "Twitter",
-      description:
-        "Follow me on Twitter to stay updated on my latest announcements",
-      value: "@ThoriqSaputra1",
-    },
-  ];
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    setFormStatus("submitting");
-
-    setTimeout(() => {
-      setFormStatus("success");
-
-      setTimeout(() => {
-        setFormStatus("idle");
-      }, 3000);
-    }, 1500);
-  };
+  useEffect(() => {
+    if (formStatus === "success") {
+      const timer = setTimeout(() => {
+        window.location.hash = "#contacts";
+      }, 5000);
+      return () => clearTimeout(timer);
+    }
+  }, [formStatus]);
 
   const copyToClipboard = (text: string, index: number) => {
     navigator.clipboard.writeText(text);
@@ -197,7 +161,20 @@ export default function ContactSection() {
     }, 2000);
   };
 
-  const bubbles = Array.from({ length: 15 }, (_, i) => i);
+  const bubbles = useMemo(
+    () =>
+      Array.from({ length: 15 }, (_, i) => ({
+        id: i,
+        width: 20 + Math.random() * 60,
+        height: 20 + Math.random() * 60,
+        left: Math.random() * 100,
+        top: Math.random() * 100,
+        opacity: 0.7 + Math.random() * 0.3,
+        x: Math.random() * 10 - 5, 
+        y: Math.random() * 10 - 5,
+      })),
+    []
+  );
 
   return (
     <section
@@ -205,19 +182,20 @@ export default function ContactSection() {
       ref={ref}
       className="w-full bg-light-pink border-b-8 border-pink-accent border-t-8 relative overflow-hidden"
     >
-      {bubbles.map((i) => (
+      {/* Conditionally render bubbles only on the client-side to avoid SSR mismatch */}
+      {typeof window !== 'undefined' && bubbles.map((bubble) => (
         <motion.div
-          key={i}
-          custom={i}
+          key={bubble.id}
+          custom={bubble} // Pass all pre-calculated values as custom prop
           variants={floatingBubbleVariants}
           initial="initial"
           animate="animate"
           className="absolute rounded-full bg-pink-accent/10"
           style={{
-            width: 20 + Math.random() * 60,
-            height: 20 + Math.random() * 60,
-            left: `${Math.random() * 100}%`,
-            top: `${Math.random() * 100}%`,
+            width: bubble.width,
+            height: bubble.height,
+            left: `${bubble.left}%`,
+            top: `${bubble.top}%`,
             zIndex: 0,
           }}
         />
@@ -242,10 +220,7 @@ export default function ContactSection() {
           initial="hidden"
           animate={inView ? "visible" : "hidden"}
         >
-          <motion.div
-            id="titleIMG"
-            className="flex flex-col items-center"
-          >
+          <motion.div id="titleIMG" className="flex flex-col items-center">
             <motion.div className="relative mb-8" variants={titleVariants}>
               <h1
                 id="mycontact"
@@ -321,7 +296,7 @@ export default function ContactSection() {
                 </Button>
               </div>
 
-              <AnimatePresence mode="wait">
+              <AnimatePresence>
                 {activeTab === "links" ? (
                   <motion.div
                     key="links"
@@ -345,23 +320,23 @@ export default function ContactSection() {
                         <Card className="overflow-hidden border-pink-accent/10 bg-white/90 backdrop-blur-sm hover:bg-light-orange/90 transition-all duration-300">
                           <CardContent className="p-0">
                             <div className="flex justify-between items-center gap-4 p-4">
-                                <div className="relative">
-                                  <div className="absolute inset-0 bg-pink-accent/10 rounded-full transform scale-0 group-hover:scale-150 transition-transform duration-500"></div>
-                                  <img
-                                    src={contact.icon || "/placeholder.svg"}
-                                    alt={contact.alt}
-                                    className="w-12 h-12 relative z-10 transition-transform duration-300 group-hover:scale-110"
-                                  />
-                                </div>
+                              <div className="relative">
+                                <div className="absolute inset-0 bg-pink-accent/10 rounded-full transform scale-0 group-hover:scale-150 transition-transform duration-500"></div>
+                                <img
+                                  src={contact.icon || "/placeholder.svg"}
+                                  alt={contact.alt}
+                                  className="w-12 h-12 relative z-10 transition-transform duration-300 group-hover:scale-110"
+                                />
+                              </div>
 
-                                <div className="flex-1">
-                                  <h3 className="font-semibold text-lg text-gray-900 group-hover:text-red-accent transition-colors duration-300">
-                                    {contact.title}
-                                  </h3>
-                                  <p className="text-sm text-gray-600">
-                                    {contact.description}
-                                  </p>
-                                </div>
+                              <div className="flex-1">
+                                <h3 className="font-semibold text-lg text-gray-900 group-hover:text-red-accent transition-colors duration-300">
+                                  {contact.title}
+                                </h3>
+                                <p className="text-sm text-gray-600">
+                                  {contact.description}
+                                </p>
+                              </div>
 
                               <div className="flex flex-col md:flex-row gap-2 items-center justify-center">
                                 <Button
@@ -413,7 +388,7 @@ export default function ContactSection() {
                     exit={{ opacity: 0, y: -20 }}
                     className="bg-white/90 backdrop-blur-sm rounded-lg shadow-lg text-black p-6 border border-pink-accent/20"
                   >
-                    <form onSubmit={handleSubmit} className="space-y-4">
+                    <fetcher.Form method="post" action="/contact" className="space-y-4">
                       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                         <div>
                           <label
@@ -426,13 +401,16 @@ export default function ContactSection() {
                             id="name"
                             name="name"
                             placeholder="Your name"
-                            required
-                            className="border-pink-accent/20 focus:border-pink-accent focus:ring-pink-accent/30"
-                            disabled={
-                              formStatus === "submitting" ||
-                              formStatus === "success"
-                            }
+                            className={`border-pink-accent/20 focus:border-pink-accent focus:ring-pink-accent/30 ${
+                              fetcher.data?.fieldErrors?.name ? "border-red-500" : ""
+                            }`}
+                            disabled={formStatus === "submitting"}
                           />
+                          {fetcher.data?.fieldErrors?.name && (
+                            <p className="text-red-500 text-xs mt-1">
+                              {fetcher.data.fieldErrors.name}
+                            </p>
+                          )}
                         </div>
                         <div>
                           <label
@@ -446,13 +424,16 @@ export default function ContactSection() {
                             name="email"
                             type="email"
                             placeholder="your.email@example.com"
-                            required
-                            className="border-pink-accent/20 focus:border-pink-accent focus:ring-pink-accent/30"
-                            disabled={
-                              formStatus === "submitting" ||
-                              formStatus === "success"
-                            }
+                            className={`border-pink-accent/20 focus:border-pink-accent focus:ring-pink-accent/30 ${
+                              fetcher.data?.fieldErrors?.email ? "border-red-500" : ""
+                            }`}
+                            disabled={formStatus === "submitting"}
                           />
+                          {fetcher.data?.fieldErrors?.email && (
+                            <p className="text-red-500 text-xs mt-1">
+                              {fetcher.data.fieldErrors.email}
+                            </p>
+                          )}
                         </div>
                       </div>
 
@@ -467,13 +448,16 @@ export default function ContactSection() {
                           id="subject"
                           name="subject"
                           placeholder="What is this regarding?"
-                          required
-                          className="border-pink-accent/20 focus:border-pink-accent focus:ring-pink-accent/30"
-                          disabled={
-                            formStatus === "submitting" ||
-                            formStatus === "success"
-                          }
+                          className={`border-pink-accent/20 focus:border-pink-accent focus:ring-pink-accent/30 ${
+                            fetcher.data?.fieldErrors?.subject ? "border-red-500" : ""
+                          }`}
+                          disabled={formStatus === "submitting"}
                         />
+                        {fetcher.data?.fieldErrors?.subject && (
+                          <p className="text-red-500 text-xs mt-1">
+                            {fetcher.data.fieldErrors.subject}
+                          </p>
+                        )}
                       </div>
 
                       <div>
@@ -488,22 +472,22 @@ export default function ContactSection() {
                           name="message"
                           placeholder="Your message here..."
                           rows={5}
-                          required
-                          className="border-pink-accent/20 focus:border-pink-accent focus:ring-pink-accent/30"
-                          disabled={
-                            formStatus === "submitting" ||
-                            formStatus === "success"
-                          }
+                          className={`border-pink-accent/20 focus:border-pink-accent focus:ring-pink-accent/30 ${
+                            fetcher.data?.fieldErrors?.message ? "border-red-500" : ""
+                          }`}
+                          disabled={formStatus === "submitting"}
                         />
+                        {fetcher.data?.fieldErrors?.message && (
+                          <p className="text-red-500 text-xs mt-1">
+                            {fetcher.data.fieldErrors.message}
+                          </p>
+                        )}
                       </div>
 
                       <Button
                         type="submit"
                         className="w-full bg-pink-accent hover:bg-red-accent text-white transition-colors duration-300"
-                        disabled={
-                          formStatus === "submitting" ||
-                          formStatus === "success"
-                        }
+                        disabled={formStatus === "submitting"}
                       >
                         {formStatus === "idle" && (
                           <>
@@ -540,6 +524,11 @@ export default function ContactSection() {
                             <Check className="mr-2 h-4 w-4" /> Message Sent!
                           </>
                         )}
+                        {formStatus === "error" && (
+                          <>
+                            <Send className="mr-2 h-4 w-4" /> Try Again
+                          </>
+                        )}
                       </Button>
 
                       {formStatus === "success" && (
@@ -551,7 +540,17 @@ export default function ContactSection() {
                           Thank you for your message! I'll get back to you soon.
                         </motion.div>
                       )}
-                    </form>
+
+                      {formStatus === "error" && (
+                        <motion.div
+                          initial={{ opacity: 0, y: 10 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          className="text-center text-red-600 bg-red-50 p-3 rounded-md"
+                        >
+                          {fetcher.data?.error || "There was an error sending your message. Please try again or contact me directly."}
+                        </motion.div>
+                      )}
+                    </fetcher.Form>
                   </motion.div>
                 )}
               </AnimatePresence>

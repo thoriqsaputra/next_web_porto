@@ -27,8 +27,10 @@
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-intersection-observer": "^9.16.0",
+    "resend": "^4.5.2",
     "tailwind-merge": "^3.3.0",
-    "tailwindcss-animate": "^1.0.7"
+    "tailwindcss-animate": "^1.0.7",
+    "zod": "^3.25.56"
   },
   "devDependencies": {
     "@remix-run/dev": "^2.16.8",
