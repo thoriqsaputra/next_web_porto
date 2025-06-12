@@ -260,7 +260,7 @@ export default function SkillSection() {
                           {category.category}
                         </h3>
                         <div className="relative">
-                          <AnimatePresence>
+                          <AnimatePresence mode="wait">
                             <motion.div
                               key={currentPageState} // Key for AnimatePresence
                               className="grid grid-cols-2 md:grid-cols-3 gap-6 min-h-[184px]"
@@ -364,7 +364,7 @@ export default function SkillSection() {
             </h2>
 
             <div className="relative">
-              <AnimatePresence>
+              <AnimatePresence mode="wait">
                 <motion.div
                   key={softSkillsPage}
                   className="grid grid-rows-2 gap-6"
@@ -451,7 +451,7 @@ export default function SkillSection() {
             </h2>
 
             <div className="relative">
-              <AnimatePresence>
+              <AnimatePresence mode="wait">
                 <motion.div
                   key={professionalSkillsPage}
                   className="grid grid-rows-2 gap-6"

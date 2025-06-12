@@ -244,7 +244,7 @@ export default function ContactSection() {
                 </Button>
               </div>
 
-              <AnimatePresence>
+              <AnimatePresence mode="wait">
                 {activeTab === "links" ? (
                   <motion.div
                     key="links"
