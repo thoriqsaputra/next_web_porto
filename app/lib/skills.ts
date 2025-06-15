@@ -13,15 +13,35 @@ export const technicalSkills = [
       { name: "TypeScript", icon: "ts.png" },
       { name: "HTML", icon: "html-5.png" },
       { name: "CSS", icon: "css-3.png" },
+      {
+        name: "SQL",
+        icon: "sql.png",
+      },
+      {
+        name: "Go",
+        icon: "https://creazilla-store.fra1.digitaloceanspaces.com/icons/3236814/golang-icon-md.png",
+      },
+      { name: "PHP", icon: "php.png" },
+      { name: "Kotlin", icon: "kotlin.png" },
     ],
   },
   {
-    category: "Frameworks",
+    category: "Frameworks & Libraries",
     skills: [
       { name: "Next.js", icon: "NextJs.png" },
       { name: "React", icon: "React.png" },
-      { name: "WPF", icon: "wpf.png" },
-      { name: "Flet", icon: "Flet.svg" },
+      { name: "Flask", icon: "flask.png" },
+      { name: "Three.js", icon: "threejs.png" },
+      { name: "Tailwind CSS", icon: "tailwindcss.png" },
+      { name: "Node.js", icon: "nodejs.png" },
+      { name: "Express.js", icon: "expressjs.png" },
+      { name: "NumPy", icon: "numpy.webp" },
+      {
+        name: "Pandas",
+        icon: "https://pandas.pydata.org/static/img/pandas_mark.svg",
+      },
+      { name: "flet", icon: "Flet.svg" },
+      { name: "wpf", icon: "wpf.png" },
     ],
   },
   {
@@ -36,6 +56,7 @@ export const technicalSkills = [
       { name: "Canva", icon: "canva.png" },
       { name: "Android Studio", icon: "android-studio.png" },
       { name: "Visual Studio", icon: "visual-studio.png" },
+      { name: "IntelliJ IDEA", icon: "intellij.png" },
     ],
   },
 ];

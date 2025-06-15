@@ -8,7 +8,7 @@ import Footer from "~/_components/footer";
 
 export const meta: MetaFunction = () => {
   return [
-    { title: "Web Portofolio - Ahmad Thoriq Saputra" },
+    { title: "Ahmad Thoriq Saputra" },
     {
       name: "description",
       content:

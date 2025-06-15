@@ -1,10 +1,7 @@
 import { motion, AnimatePresence } from "framer-motion";
 import { useInView } from "react-intersection-observer";
 import { useState, useEffect } from "react"; // Import useEffect
-import {
-  ChevronLeft,
-  ChevronRight,
-} from "lucide-react";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "~/components/ui/button";
 import { Card, CardContent } from "~/components/ui/card";
 
@@ -76,23 +73,23 @@ export default function SkillSection() {
 
   // Auto-slide for Soft Skills
   useEffect(() => {
-    if (!inView) return; // Only auto-slide when in view
+    if (!inView) return;
     const slideInterval = setInterval(() => {
       setSoftSkillsPage((prevPage) =>
         prevPage === softSkillsPages - 1 ? 0 : prevPage + 1
       );
-    }, 4000); // Change slide every 4 seconds
+    }, 9000);
     return () => clearInterval(slideInterval);
   }, [softSkillsPages, inView]);
 
   // Auto-slide for Professional Skills
   useEffect(() => {
-    if (!inView) return; // Only auto-slide when in view
+    if (!inView) return;
     const slideInterval = setInterval(() => {
       setProfessionalSkillsPage((prevPage) =>
         prevPage === professionalSkillsPages - 1 ? 0 : prevPage + 1
       );
-    }, 4000); // Change slide every 4 seconds
+    }, 9000); // Change slide every 9 seconds
     return () => clearInterval(slideInterval);
   }, [professionalSkillsPages, inView]);
 
@@ -103,12 +100,12 @@ export default function SkillSection() {
       technicalSkills.find((t) => t.category === "Programming Languages")
         ?.skills || [];
     const pages = getTechnicalSkillPages(skills);
-    if (pages <= 1) return; // No need to auto-slide if only one page
+    if (pages <= 1) return;
     const slideInterval = setInterval(() => {
       setProgrammingLanguagesPage((prevPage) =>
         prevPage === pages - 1 ? 0 : prevPage + 1
       );
-    }, 4000);
+    }, 9000);
     return () => clearInterval(slideInterval);
   }, [inView, technicalSkills]);
 
@@ -123,7 +120,7 @@ export default function SkillSection() {
       setFrameworksPage((prevPage) =>
         prevPage === pages - 1 ? 0 : prevPage + 1
       );
-    }, 4000);
+    }, 9000);
     return () => clearInterval(slideInterval);
   }, [inView, technicalSkills]);
 
@@ -139,7 +136,7 @@ export default function SkillSection() {
       setDevelopmentToolsPage((prevPage) =>
         prevPage === pages - 1 ? 0 : prevPage + 1
       );
-    }, 4000);
+    }, 9000);
     return () => clearInterval(slideInterval);
   }, [inView, technicalSkills]);
 
@@ -165,13 +162,26 @@ export default function SkillSection() {
     setPage(Math.min(pages - 1, currentPage + 1));
   };
 
+  const getSkillIcon = (category: string, skill: any) => {
+    if (skill.icon.startsWith("http")) {
+      return skill.icon;
+    }
+    if (category === "Programming Languages") {
+      return `/skill/Prog/${skill.icon}`;
+    } else if (category === "Frameworks & Libraries") {
+      return `/skill/Frame/${skill.icon}`;
+    } else if (category === "Development Tools") {
+      return `/skill/Dev/${skill.icon}`;
+    }
+    return "";
+  };
+
   return (
     <section
       id="MeSkill"
       ref={ref}
       className="bg-gradient-to-br from-[#fc6b39] to-[#d56d74] h-fit w-full relative border-b-8 border-pink-accent overflow-hidden"
     >
-
       <img
         src="/skill/WaveSkill.svg"
         width="150"
@@ -283,14 +293,10 @@ export default function SkillSection() {
                                 >
                                   <div className="bg-white/90 p-4 rounded-xl shadow-md group-hover:shadow-lg transition-shadow duration-200">
                                     <img
-                                      src={`/skill/${
-                                        category.category ===
-                                        "Programming Languages"
-                                          ? "Prog"
-                                          : category.category === "Frameworks"
-                                          ? "Frame"
-                                          : "Dev"
-                                      }/${skill.icon}`}
+                                      src={getSkillIcon(
+                                        category.category,
+                                        skill
+                                      )}
                                       alt={skill.name}
                                       width="50"
                                       height="50"
