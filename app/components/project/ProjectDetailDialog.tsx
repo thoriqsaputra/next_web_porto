@@ -1,5 +1,5 @@
 // components/ProjectDetailDialog.tsx
-import React from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   X,
@@ -10,6 +10,12 @@ import {
   Calendar,
   Tag,
   Layers,
+  Play,
+  Pause,
+  Volume2,
+  VolumeX,
+  Maximize,
+  RotateCcw,
 } from "lucide-react";
 import { Button } from "~/components/ui/button";
 import { Badge } from "~/components/ui/badge";
@@ -22,45 +28,123 @@ import {
 import { Link } from "@remix-run/react";
 import { DialogClose } from "@radix-ui/react-dialog";
 
-interface ProjectImage {
-  src: string;
-  alt: string;
-}
-
-interface Project {
-  id: string;
-  title: string;
-  description: string;
-  longDescription?: string;
-  images: ProjectImage[];
-  category: ProjectCategory;
-  technologies: ProjectTechnology[];
-  githubUrl?: string;
-  liveUrl?: string;
-  date: string;
-  featured?: boolean;
-}
-
-type ProjectCategory = "web" | "ai" | "mobile" | "desktop" | "game" | "all";
-type ProjectTechnology =
-  | "react"
-  | "nextjs"
-  | "spring"
-  | "flask"
-  | "wpf"
-  | "tailwind"
-  | "python"
-  | "java"
-  | "csharp";
+import { Project } from "~/lib/projects";
+import { getTechBadgeColor } from "~/lib/projects";
 
 interface ProjectDetailDialogProps {
   selectedProject: Project | null;
   setSelectedProject: (project: Project | null) => void;
-  activeImageIndex: number;
-  setActiveImageIndex: React.Dispatch<React.SetStateAction<number>>;
+  activeMediaIndex: number;
+  setActiveMediaIndex: React.Dispatch<React.SetStateAction<number>>;
   direction: number;
   setDirection: (direction: number) => void;
 }
+
+interface VideoControlsProps {
+  videoRef: React.RefObject<HTMLVideoElement>;
+  isPlaying: boolean;
+  setIsPlaying: (playing: boolean) => void;
+  isMuted: boolean;
+  setIsMuted: (muted: boolean) => void;
+  currentTime: number;
+  duration: number;
+  onSeek: (time: number) => void;
+  onFullscreen: () => void;
+  onRestart: () => void;
+}
+
+const VideoControls: React.FC<VideoControlsProps> = ({
+  videoRef,
+  isPlaying,
+  setIsPlaying,
+  isMuted,
+  setIsMuted,
+  currentTime,
+  duration,
+  onSeek,
+  onFullscreen,
+  onRestart,
+}) => {
+  const formatTime = (time: number) => {
+    const minutes = Math.floor(time / 60);
+    const seconds = Math.floor(time % 60);
+    return `${minutes}:${seconds.toString().padStart(2, "0")}`;
+  };
+
+  const handleProgressClick = (e: React.MouseEvent<HTMLDivElement>) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    const percent = (e.clientX - rect.left) / rect.width;
+    onSeek(percent * duration);
+  };
+
+  return (
+    <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-4">
+      {/* Progress Bar */}
+      <div
+        className="w-full h-1 bg-white/30 rounded-full mb-3 cursor-pointer"
+        onClick={handleProgressClick}
+      >
+        <div
+          className="h-full bg-highlight-orange rounded-full transition-all duration-200"
+          style={{ width: `${duration ? (currentTime / duration) * 100 : 0}%` }}
+        />
+      </div>
+
+      {/* Controls */}
+      <div className="flex items-center justify-between text-white">
+        <div className="flex items-center gap-2">
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => setIsPlaying(!isPlaying)}
+            className="hover:bg-white/20 p-2"
+          >
+            {isPlaying ? (
+              <Pause className="h-4 w-4" />
+            ) : (
+              <Play className="h-4 w-4" />
+            )}
+          </Button>
+
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={onRestart}
+            className="hover:bg-white/20 p-2"
+          >
+            <RotateCcw className="h-4 w-4" />
+          </Button>
+
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => setIsMuted(!isMuted)}
+            className="hover:bg-white/20 p-2"
+          >
+            {isMuted ? (
+              <VolumeX className="h-4 w-4" />
+            ) : (
+              <Volume2 className="h-4 w-4" />
+            )}
+          </Button>
+
+          <span className="text-sm">
+            {formatTime(currentTime)} / {formatTime(duration)}
+          </span>
+        </div>
+
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={onFullscreen}
+          className="hover:bg-white/20 p-2"
+        >
+          <Maximize className="h-4 w-4" />
+        </Button>
+      </div>
+    </div>
+  );
+};
 
 const carouselVariants = {
   enter: (direction: number) => ({
@@ -83,44 +167,107 @@ const carouselVariants = {
   }),
 };
 
-const getTechBadgeColor = (tech: string) => {
-  const techColors: Record<string, string> = {
-    react: "bg-blue-500 hover:bg-blue-600",
-    nextjs: "bg-black hover:bg-gray-800",
-    spring: "bg-green-500 hover:bg-green-600",
-    flask: "bg-gray-500 hover:bg-gray-600",
-    wpf: "bg-purple-500 hover:bg-purple-600",
-    tailwind: "bg-cyan-500 hover:bg-cyan-600",
-    python: "bg-yellow-500 hover:bg-yellow-600",
-    java: "bg-red-500 hover:bg-red-600",
-    csharp: "bg-green-600 hover:bg-green-700",
-  };
-
-  return techColors[tech] || "bg-gray-500 hover:bg-gray-600";
-};
-
 export const ProjectDetailDialog: React.FC<ProjectDetailDialogProps> = ({
   selectedProject,
   setSelectedProject,
-  activeImageIndex,
-  setActiveImageIndex,
+  activeMediaIndex,
+  setActiveMediaIndex,
   direction,
   setDirection,
 }) => {
-  const nextImage = () => {
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [isMuted, setIsMuted] = useState(false);
+  const [currentTime, setCurrentTime] = useState(0);
+  const [duration, setDuration] = useState(0);
+  const videoRef = useRef<HTMLVideoElement>(null);
+
+  const currentMedia = selectedProject?.media[activeMediaIndex];
+  const isCurrentVideo = currentMedia?.type === "video";
+
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video || !isCurrentVideo) return;
+
+    const updateTime = () => setCurrentTime(video.currentTime);
+    const updateDuration = () => setDuration(video.duration);
+
+    video.addEventListener("timeupdate", updateTime);
+    video.addEventListener("loadedmetadata", updateDuration);
+    video.addEventListener("ended", () => setIsPlaying(false));
+
+    return () => {
+      video.removeEventListener("timeupdate", updateTime);
+      video.removeEventListener("loadedmetadata", updateDuration);
+      video.removeEventListener("ended", () => setIsPlaying(false));
+    };
+  }, [isCurrentVideo, activeMediaIndex]);
+
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video || !isCurrentVideo) return;
+
+    if (isPlaying) {
+      video.play();
+    } else {
+      video.pause();
+    }
+  }, [isPlaying, isCurrentVideo]);
+
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video || !isCurrentVideo) return;
+
+    video.muted = isMuted;
+  }, [isMuted, isCurrentVideo]);
+
+  // Reset video state when changing media
+  useEffect(() => {
+    if (isCurrentVideo) {
+      setIsPlaying(false);
+      setCurrentTime(0);
+    }
+  }, [activeMediaIndex, isCurrentVideo]);
+
+  const nextMedia = () => {
     if (!selectedProject) return;
     setDirection(1);
-    setActiveImageIndex((prevIndex: number) =>
-      prevIndex === selectedProject.images.length - 1 ? 0 : prevIndex + 1
+    setActiveMediaIndex((prevIndex: number) =>
+      prevIndex === selectedProject.media.length - 1 ? 0 : prevIndex + 1
     );
   };
 
-  const prevImage = () => {
+  const prevMedia = () => {
     if (!selectedProject) return;
     setDirection(-1);
-    setActiveImageIndex((prevIndex: number) =>
-      prevIndex === 0 ? selectedProject.images.length - 1 : prevIndex - 1
+    setActiveMediaIndex((prevIndex: number) =>
+      prevIndex === 0 ? selectedProject.media.length - 1 : prevIndex - 1
     );
+  };
+
+  const handleSeek = (time: number) => {
+    const video = videoRef.current;
+    if (video) {
+      video.currentTime = time;
+      setCurrentTime(time);
+    }
+  };
+
+  const handleFullscreen = () => {
+    const video = videoRef.current;
+    if (video) {
+      if (video.requestFullscreen) {
+        video.requestFullscreen();
+      }
+    }
+  };
+
+  const handleRestart = () => {
+    const video = videoRef.current;
+    if (video) {
+      video.currentTime = 0;
+      setCurrentTime(0);
+      setIsPlaying(true);
+    }
   };
 
   return (
@@ -147,7 +294,7 @@ export const ProjectDetailDialog: React.FC<ProjectDetailDialogProps> = ({
             <DialogHeader className="border-b border-white/10 pb-3 sm:pb-4 mb-4 sm:mb-6">
               <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 sm:gap-4">
                 <div className="flex-1 min-w-0">
-                  <div className="flex">
+                  <div className="flex justify-between">
                     <DialogTitle
                       className="
                     text-xl sm:text-2xl md:text-3xl font-bold 
@@ -156,7 +303,10 @@ export const ProjectDetailDialog: React.FC<ProjectDetailDialogProps> = ({
                     >
                       {selectedProject.title}
                     </DialogTitle>
-                    <DialogClose asChild className="absolute top-2 right-2 sm:top-4 sm:right-4 flex md:hidden">
+                    <DialogClose
+                      asChild
+                      className="absolute top-2 right-2 sm:top-4 sm:right-4 flex md:hidden"
+                    >
                       <Button
                         variant="ghost"
                         size="icon"
@@ -173,13 +323,17 @@ export const ProjectDetailDialog: React.FC<ProjectDetailDialogProps> = ({
                     </DialogClose>
                   </div>
                   <div className="flex flex-wrap items-center gap-2 sm:gap-4 text-xs sm:text-sm text-white/70">
-                    <Badge
-                      variant="outline"
-                      className="border-highlight-orange/30 text-highlight-orange text-xs"
-                    >
-                      {selectedProject.category.charAt(0).toUpperCase() +
-                        selectedProject.category.slice(1)}
-                    </Badge>
+                    {selectedProject.categories.map((category) => (
+                      <Badge
+                        key={category}
+                        className={`bg-${getTechBadgeColor(
+                          category
+                        )} text-white`}
+                      >
+                        <Layers className="h-3 w-3 sm:h-4 sm:w-4 mr-1" />
+                        {category}
+                      </Badge>
+                    ))}
                     <div className="flex items-center">
                       <Calendar className="h-3 w-3 sm:h-4 sm:w-4 mr-1" />
                       <span className="hidden sm:inline">
@@ -265,65 +419,100 @@ export const ProjectDetailDialog: React.FC<ProjectDetailDialogProps> = ({
               </div>
             </DialogHeader>
 
-            <div className="overflow-y-auto flex-1 max-h-[calc(100vh-200px)] md:max-h-[calc(100vh-300px)]">
+            <div className="overflow-y-auto flex-1 max-h-[calc(100vh-200px)] md:max-h-[calc(100vh-250px)]">
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
                 <div className="lg:col-span-2 order-1 lg:order-1">
                   <div className="relative aspect-video overflow-hidden rounded-lg sm:rounded-xl bg-black/20 border border-white/10">
                     <AnimatePresence initial={false} custom={direction}>
-                      <motion.img
-                        key={activeImageIndex}
-                        src={selectedProject.images[activeImageIndex].src}
-                        alt={selectedProject.images[activeImageIndex].alt}
-                        className="absolute w-full h-full object-cover"
-                        custom={direction}
-                        variants={carouselVariants}
-                        initial="enter"
-                        animate="center"
-                        exit="exit"
-                        transition={{ duration: 0.5 }}
-                      />
+                      {currentMedia?.type === "video" ? (
+                        <motion.div
+                          key={activeMediaIndex}
+                          className="absolute w-full h-full"
+                          custom={direction}
+                          variants={carouselVariants}
+                          initial="enter"
+                          animate="center"
+                          exit="exit"
+                          transition={{ duration: 0.5 }}
+                        >
+                          <video
+                            ref={videoRef}
+                            src={currentMedia.src}
+                            className="w-full h-full object-cover"
+                            loop={currentMedia.loop}
+                            muted={isMuted}
+                            playsInline
+                            preload="metadata"
+                          />
+                          <VideoControls
+                            videoRef={videoRef}
+                            isPlaying={isPlaying}
+                            setIsPlaying={setIsPlaying}
+                            isMuted={isMuted}
+                            setIsMuted={setIsMuted}
+                            currentTime={currentTime}
+                            duration={duration}
+                            onSeek={handleSeek}
+                            onFullscreen={handleFullscreen}
+                            onRestart={handleRestart}
+                          />
+                        </motion.div>
+                      ) : (
+                        <motion.img
+                          key={activeMediaIndex}
+                          src={currentMedia?.src}
+                          alt={currentMedia?.alt}
+                          className="absolute w-full h-full object-cover"
+                          custom={direction}
+                          variants={carouselVariants}
+                          initial="enter"
+                          animate="center"
+                          exit="exit"
+                          transition={{ duration: 0.5 }}
+                        />
+                      )}
                     </AnimatePresence>
 
-                    {selectedProject.images.length > 1 && (
+                    {selectedProject.media.length > 1 && (
                       <>
                         <Button
                           variant="ghost"
                           size="icon"
-                          onClick={prevImage}
+                          onClick={prevMedia}
                           className="absolute left-2 sm:left-3 top-1/2 transform -translate-y-1/2 
                             bg-black/50 hover:bg-black/70 text-white rounded-full 
-                            h-8 w-8 sm:h-10 sm:w-10 backdrop-blur-sm"
+                            h-8 w-8 sm:h-10 sm:w-10 backdrop-blur-sm z-10"
                         >
                           <ChevronLeft className="h-4 w-4 sm:h-5 sm:w-5" />
                         </Button>
                         <Button
                           variant="ghost"
                           size="icon"
-                          onClick={nextImage}
+                          onClick={nextMedia}
                           className="absolute right-2 sm:right-3 top-1/2 transform -translate-y-1/2 
                             bg-black/50 hover:bg-black/70 text-white rounded-full 
-                            h-8 w-8 sm:h-10 sm:w-10 backdrop-blur-sm"
+                            h-8 w-8 sm:h-10 sm:w-10 backdrop-blur-sm z-10"
                         >
                           <ChevronRight className="h-4 w-4 sm:h-5 sm:w-5" />
                         </Button>
 
                         <div
                           className="absolute bottom-2 sm:bottom-4 left-1/2 transform -translate-x-1/2 
-                          flex gap-1 sm:gap-2 bg-black/50 backdrop-blur-sm rounded-full px-2 sm:px-3 py-1 sm:py-2"
+                          flex gap-1 sm:gap-2 bg-black/50 backdrop-blur-sm rounded-full px-2 sm:px-3 py-1 sm:py-2 z-10"
                         >
-                          {selectedProject.images.map((_, index) => (
+                          {selectedProject.media.map((media, index) => (
                             <button
                               key={index}
                               onClick={() => {
-                                setDirection(index > activeImageIndex ? 1 : -1);
-                                setActiveImageIndex(index);
+                                setDirection(index > activeMediaIndex ? 1 : -1);
+                                setActiveMediaIndex(index);
                               }}
                               className={`w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full transition-all duration-300 ${
-                                index === activeImageIndex
+                                index === activeMediaIndex
                                   ? "bg-highlight-orange w-4 sm:w-6"
                                   : "bg-white/50 hover:bg-white/80"
                               }`}
-                              aria-label={`Go to image ${index + 1}`}
+                              aria-label={`Go to ${media.type} ${index + 1}`}
                             />
                           ))}
                         </div>
@@ -332,36 +521,49 @@ export const ProjectDetailDialog: React.FC<ProjectDetailDialogProps> = ({
 
                     <div
                       className="absolute top-2 sm:top-4 right-2 sm:right-4 
-                      bg-black/50 backdrop-blur-sm text-white text-xs sm:text-sm px-2 sm:px-3 py-1 rounded-full"
+                      bg-black/50 backdrop-blur-sm text-white text-xs sm:text-sm px-2 sm:px-3 py-1 rounded-full z-10"
                     >
-                      {activeImageIndex + 1} / {selectedProject.images.length}
+                      {activeMediaIndex + 1} / {selectedProject.media.length}
+                      {currentMedia?.type === "video" && (
+                        <span className="ml-1 text-highlight-orange">📹</span>
+                      )}
                     </div>
                   </div>
 
-                  {selectedProject.images.length > 1 && (
+                  {selectedProject.media.length > 1 && (
                     <div
                       className="flex gap-1 sm:gap-2 mt-3 sm:mt-4 overflow-x-auto pb-2 
                       scrollbar-thin scrollbar-thumb-white/20 scrollbar-track-transparent"
                     >
-                      {selectedProject.images.map((image, index) => (
+                      {selectedProject.media.map((media, index) => (
                         <button
                           key={index}
                           onClick={() => {
-                            setDirection(index > activeImageIndex ? 1 : -1);
-                            setActiveImageIndex(index);
+                            setDirection(index > activeMediaIndex ? 1 : -1);
+                            setActiveMediaIndex(index);
                           }}
                           className={`relative flex-shrink-0 w-16 h-10 sm:w-20 sm:h-12 rounded-md sm:rounded-lg 
                             overflow-hidden border-2 transition-all ${
-                              index === activeImageIndex
+                              index === activeMediaIndex
                                 ? "border-highlight-orange"
                                 : "border-white/20 hover:border-white/40"
                             }`}
                         >
                           <img
-                            src={image.src || "/placeholder.svg"}
-                            alt={image.alt}
+                            src={
+                              media.thumbnail || media.src || "/placeholder.svg"
+                            }
+                            alt={media.alt}
                             className="w-full h-full object-cover"
                           />
+                          {media.type === "video" && (
+                            <div className="absolute inset-0 flex items-center justify-center bg-black/30">
+                              <Play
+                                className="h-3 w-3 text-white"
+                                fill="white"
+                              />
+                            </div>
+                          )}
                         </button>
                       ))}
                     </div>
@@ -377,7 +579,7 @@ export const ProjectDetailDialog: React.FC<ProjectDetailDialogProps> = ({
                       <Tag className="h-3 w-3 sm:h-4 sm:w-4 mr-2" />
                       Project Overview
                     </h4>
-                    <p className="text-white/80 leading-relaxed text-xs sm:text-sm">
+                    <p className="text-white/80 leading-relaxed text-xs sm:text-sm text-justify">
                       {selectedProject.longDescription ||
                         selectedProject.description}
                     </p>
@@ -412,8 +614,8 @@ export const ProjectDetailDialog: React.FC<ProjectDetailDialogProps> = ({
                     <div className="space-y-1.5 sm:space-y-2 text-xs sm:text-sm">
                       <div className="flex justify-between">
                         <span className="text-white/70">Category:</span>
-                        <span className="text-white capitalize">
-                          {selectedProject.category}
+                        <span className="text-white">
+                          {selectedProject.categories.join(", ")}
                         </span>
                       </div>
                       <div className="flex justify-between">
@@ -426,6 +628,23 @@ export const ProjectDetailDialog: React.FC<ProjectDetailDialogProps> = ({
                               year: "numeric",
                             }
                           )}
+                        </span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-white/70">Media:</span>
+                        <span className="text-white">
+                          {
+                            selectedProject.media.filter(
+                              (m) => m.type === "image"
+                            ).length
+                          }{" "}
+                          images,{" "}
+                          {
+                            selectedProject.media.filter(
+                              (m) => m.type === "video"
+                            ).length
+                          }{" "}
+                          videos
                         </span>
                       </div>
                       <div className="flex justify-between">

@@ -7,6 +7,8 @@ import {
   ExternalLink,
   Calendar,
   Layers,
+  Play,
+  Pause,
 } from "lucide-react";
 import { Button } from "~/components/ui/button";
 import { Badge } from "~/components/ui/badge";
@@ -18,42 +20,14 @@ import {
   TooltipTrigger,
 } from "~/components/ui/tooltip";
 
-interface ProjectImage {
-  src: string;
-  alt: string;
-}
-
-interface Project {
-  id: string;
-  title: string;
-  description: string;
-  longDescription?: string;
-  images: ProjectImage[];
-  category: ProjectCategory;
-  technologies: ProjectTechnology[];
-  githubUrl?: string;
-  liveUrl?: string;
-  date: string;
-  featured?: boolean;
-}
-
-type ProjectCategory = "web" | "ai" | "mobile" | "desktop" | "game" | "all";
-type ProjectTechnology =
-  | "react"
-  | "nextjs"
-  | "spring"
-  | "flask"
-  | "wpf"
-  | "tailwind"
-  | "python"
-  | "java"
-  | "csharp";
+import { Project } from "~/lib/projects";
+import { getTechBadgeColor } from "~/lib/projects";
 
 interface ProjectCardProps {
   project: Project;
   index: number;
   setSelectedProject: (project: Project | null) => void;
-  setActiveImageIndex: (index: number) => void;
+  setActiveMediaIndex: (index: number) => void;
 }
 
 const projectCardVariants = {
@@ -85,28 +59,64 @@ const projectCardVariants = {
   },
 };
 
-const getTechBadgeColor = (tech: string) => {
-  const techColors: Record<string, string> = {
-    react: "bg-blue-500 hover:bg-blue-600",
-    nextjs: "bg-black hover:bg-gray-800",
-    spring: "bg-green-500 hover:bg-green-600",
-    flask: "bg-gray-500 hover:bg-gray-600",
-    wpf: "bg-purple-500 hover:bg-purple-600",
-    tailwind: "bg-cyan-500 hover:bg-cyan-600",
-    python: "bg-yellow-500 hover:bg-yellow-600",
-    java: "bg-red-500 hover:bg-red-600",
-    csharp: "bg-green-600 hover:bg-green-700",
-  };
-
-  return techColors[tech] || "bg-gray-500 hover:bg-gray-600";
-};
-
 export const ProjectCard: React.FC<ProjectCardProps> = ({
   project,
   index,
   setSelectedProject,
-  setActiveImageIndex,
+  setActiveMediaIndex,
 }) => {
+  const [isPlaying, setIsPlaying] = React.useState(false);
+  const [isHovered, setIsHovered] = React.useState(false);
+  const videoRef = React.useRef<HTMLVideoElement>(null);
+
+  const firstMedia = project.media[0];
+  const isFirstMediaVideo = firstMedia?.type === 'video';
+
+  const handlePlayPause = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    
+    if (videoRef.current) {
+      if (isPlaying) {
+        videoRef.current.pause();
+      } else {
+        videoRef.current.play();
+      }
+      setIsPlaying(!isPlaying);
+    }
+  };
+
+  const handleVideoPlay = () => setIsPlaying(true);
+  const handleVideoPause = () => setIsPlaying(false);
+
+  React.useEffect(() => {
+    const video = videoRef.current;
+    if (video) {
+      video.addEventListener('play', handleVideoPlay);
+      video.addEventListener('pause', handleVideoPause);
+      
+      return () => {
+        video.removeEventListener('play', handleVideoPlay);
+        video.removeEventListener('pause', handleVideoPause);
+      };
+    }
+  }, []);
+
+  // Auto-play video on hover, pause when not hovered
+  React.useEffect(() => {
+    const video = videoRef.current;
+    if (video && isFirstMediaVideo) {
+      if (isHovered) {
+        video.play().catch(() => {
+          // Handle autoplay restrictions
+        });
+      } else {
+        video.pause();
+        video.currentTime = 0; // Reset to beginning
+      }
+    }
+  }, [isHovered, isFirstMediaVideo]);
+
   return (
     <motion.div
       key={project.id}
@@ -117,17 +127,31 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({
       exit="exit"
       whileHover="hover"
       className="group"
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
     >
       <Card className="overflow-hidden border-none bg-gradient-to-br from-white/10 to-white/5 backdrop-blur-sm hover:from-light-orange/20 hover:to-highlight-orange/10 transition-all duration-500 h-auto min-h-[16rem] sm:h-64">
         <CardContent className="p-0 h-full">
           <div className="flex flex-col sm:flex-row h-full">
             <div className="relative w-full sm:w-80 flex-shrink-0 overflow-hidden h-48 sm:h-full">
               <div className="relative h-full overflow-hidden">
-                <img
-                  src={project.images[0].src || "/placeholder.svg"}
-                  alt={project.images[0].alt}
-                  className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
-                />
+                {isFirstMediaVideo ? (
+                  <video
+                    ref={videoRef}
+                    src={firstMedia.src}
+                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                    muted
+                    loop
+                    playsInline
+                    poster={firstMedia.thumbnail}
+                  />
+                ) : (
+                  <img
+                    src={firstMedia?.src || "/placeholder.svg"}
+                    alt={firstMedia?.alt || "Project preview"}
+                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                  />
+                )}
 
                 <div className="absolute top-2 left-2 flex gap-1">
                   {project.featured && (
@@ -135,13 +159,29 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({
                       Featured
                     </div>
                   )}
-                  {project.images.length > 1 && (
+                  {project.media.length > 1 && (
                     <div className="bg-black/70 text-white text-xs px-2 py-1 rounded-md backdrop-blur-sm flex items-center">
                       <Layers className="h-3 w-3 mr-1" />
-                      {project.images.length}
+                      {project.media.length}
                     </div>
                   )}
                 </div>
+
+                {/* Video play/pause button */}
+                {isFirstMediaVideo && (
+                  <button
+                    onClick={handlePlayPause}
+                    className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 
+                      bg-black/50 hover:bg-black/70 text-white rounded-full p-2 sm:p-3
+                      transition-all duration-300 opacity-0 group-hover:opacity-100 backdrop-blur-sm"
+                  >
+                    {isPlaying ? (
+                      <Pause className="h-4 w-4 sm:h-6 sm:w-6" />
+                    ) : (
+                      <Play className="h-4 w-4 sm:h-6 sm:w-6" />
+                    )}
+                  </button>
+                )}
 
                 <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
                   <div className="flex gap-2">
@@ -152,7 +192,7 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({
                       onClick={(e) => {
                         e.preventDefault();
                         setSelectedProject(project);
-                        setActiveImageIndex(0);
+                        setActiveMediaIndex(0);
                       }}
                     >
                       <ArrowUpRight className="h-3 w-3 sm:h-4 sm:w-4 mr-1" />
@@ -247,7 +287,7 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({
                   className="text-white/70 hover:text-highlight-orange hover:bg-white/10 text-xs p-2 h-auto self-start md:self-auto"
                   onClick={() => {
                     setSelectedProject(project);
-                    setActiveImageIndex(0);
+                    setActiveMediaIndex(0);
                   }}
                 >
                   <span className="hidden md:inline">View Details</span>

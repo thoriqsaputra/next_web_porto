@@ -16,7 +16,14 @@ import {
 import { ProjectCard } from "~/components/project/ProjectCard";
 import { ProjectDetailDialog } from "~/components/project/ProjectDetailDialog";
 
-import { allProjects, Project, ProjectCategory, ProjectTechnology } from "~/lib/projects";
+import { categories, technologies } from "~/lib/projects";
+
+import {
+  allProjects,
+  Project,
+  ProjectCategory,
+  ProjectTechnology,
+} from "~/lib/projects";
 
 const filterVariants = {
   hidden: { opacity: 0, y: -20 },
@@ -50,7 +57,6 @@ const searchResultVariants = {
 };
 
 export default function ProjectSection() {
-
   // State management
   const [ref, inView] = useInView({
     triggerOnce: false,
@@ -97,8 +103,8 @@ export default function ProjectSection() {
 
     // Filter by category
     if (selectedCategory !== "all") {
-      results = results.filter(
-        (project) => project.category === selectedCategory
+      results = results.filter((project) =>
+        project.categories.includes(selectedCategory as ProjectCategory)
       );
     }
 
@@ -149,28 +155,6 @@ export default function ProjectSection() {
   const totalPages = Math.ceil(filteredProjects.length / projectsPerPage);
 
   const [activeImageIndex, setActiveImageIndex] = useState(0);
-
-  const categories = [
-    { value: "all", label: "All Categories" },
-    { value: "web", label: "Web Development" },
-    { value: "ai", label: "Artificial Intelligence" },
-    { value: "mobile", label: "Mobile Apps" },
-    { value: "desktop", label: "Desktop Software" },
-    { value: "game", label: "Game Development" },
-  ];
-
-  const technologies = [
-    { value: "all", label: "All Technologies" },
-    { value: "react", label: "React" },
-    { value: "nextjs", label: "Next.js" },
-    { value: "spring", label: "Spring Boot" },
-    { value: "flask", label: "Flask" },
-    { value: "wpf", label: "WPF" },
-    { value: "tailwind", label: "Tailwind CSS" },
-    { value: "python", label: "Python" },
-    { value: "java", label: "Java" },
-    { value: "csharp", label: "C#" },
-  ];
 
   return (
     <section
@@ -423,7 +407,7 @@ export default function ProjectSection() {
                       project={project}
                       index={index}
                       setSelectedProject={setSelectedProject}
-                      setActiveImageIndex={setActiveImageIndex}
+                      setActiveMediaIndex={setActiveImageIndex}
                     />
                   ))}
                 </AnimatePresence>
@@ -502,8 +486,8 @@ export default function ProjectSection() {
       <ProjectDetailDialog
         selectedProject={selectedProject}
         setSelectedProject={setSelectedProject}
-        activeImageIndex={activeImageIndex}
-        setActiveImageIndex={setActiveImageIndex}
+        activeMediaIndex={activeImageIndex}
+        setActiveMediaIndex={setActiveImageIndex}
         direction={direction}
         setDirection={setDirection}
       />
